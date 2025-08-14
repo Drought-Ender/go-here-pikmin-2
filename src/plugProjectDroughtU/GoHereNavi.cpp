@@ -103,7 +103,10 @@ void NaviGoHereState::init(Navi* player, StateArg* arg)
 	player->setMoveRotation(true);
 
 	mTargetPosition = goHereArg->mPosition;
-	mPath           = goHereArg->mPath;
+	mPath.allocate(goHereArg->mPath.mLength);
+	for (u16 i = 0; i < goHereArg->mPath.mLength; ++i) {
+		mPath.mWaypointList[i] = goHereArg->mPath.mWaypointList[i];
+	}
 
 	mActiveRouteNodeIndex = 0;
 	mLastPosition         = player->getPosition();

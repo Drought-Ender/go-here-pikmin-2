@@ -35,6 +35,17 @@ struct Path {
 		}
 	}
 
+	void swap(Path& other) {
+		u16 tempL = mLength;
+		s16* tempW = mWaypointList;
+
+		mLength = other.mLength;
+		mWaypointList = other.mWaypointList;
+
+		other.mLength = tempL;
+		other.mWaypointList = tempW;
+	}
+
 	inline bool hasPath() const { return mLength != 0 && mWaypointList; }
 
 	void allocate(u16 size);

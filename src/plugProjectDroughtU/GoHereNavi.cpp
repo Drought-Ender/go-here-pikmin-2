@@ -10,6 +10,8 @@
 #include "Game/GameLight.h"
 #include "Game/CPlate.h"
 
+#define GO_HERE_NAVI_DEBUG (false)
+
 namespace Game {
 
 bool AreAllPikisBlue(Navi* navi)
@@ -98,16 +100,15 @@ void NaviGoHereState::init(Navi* player, StateArg* arg)
 {
 	P2ASSERT(arg);
 	NaviGoHereStateArg* goHereArg = static_cast<NaviGoHereStateArg*>(arg);
+	
 
 	player->startMotion(IPikiAnims::WALK, IPikiAnims::WALK, nullptr, nullptr);
 	player->setMoveRotation(true);
 
 	mTargetPosition = goHereArg->mPosition;
-	mPath.allocate(goHereArg->mPath.mLength);
-	for (u16 i = 0; i < goHereArg->mPath.mLength; ++i) {
-		mPath.mWaypointList[i] = goHereArg->mPath.mWaypointList[i];
-	}
 
+	mPath.swap(goHereArg->mPath);	
+	
 	mActiveRouteNodeIndex = 0;
 	mLastPosition         = player->getPosition();
 	mTimeoutTimer         = 0.0f;
@@ -428,9 +429,10 @@ void NaviGoHereState::changeState(Navi* player, bool isWanted)
 	PSSystem::spSysIF->playSystemSe(isWanted ? PSSE_SY_PLAYER_CHANGE : PSSE_PL_ORIMA_DAMAGE, 0);
 }
 
+
 void Navi::doDirectDraw(Graphics& gfx)
 {
-	return;
+#if GO_HERE_NAVI_DEBUG
 
 	if (getStateID() != NSID_GoHere) {
 		return;
@@ -444,6 +446,7 @@ void Navi::doDirectDraw(Graphics& gfx)
 	info.mColorA = Color4(0xC8, 0xC8, 0xFF, 0xC8);
 	info.mColorB = Color4(0x64, 0x64, 0xFF, 0xC8);
 	gfx.perspPrintf(info, pos, "[%d/%d] t[%1.1f]", state->mActiveRouteNodeIndex, state->mPath.mLength, state->mTimeoutTimer);
+#endif
 }
 
 bool Navi::canSwap()

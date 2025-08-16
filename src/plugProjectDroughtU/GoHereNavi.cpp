@@ -166,7 +166,7 @@ void NaviGoHereState::exec(Navi* player)
 
 	// Update the camera angle
 	Vector3f playerPos = player->getPosition();
-	{
+	if (player->mNaviIndex == gameSystem->mSection->mCurrentPlayerIndex) {
 		static f32 currentAngle = roundAng(player->getFaceDir() + PI);
 		f32 targetAngle         = roundAng(player->getFaceDir() + PI);
 

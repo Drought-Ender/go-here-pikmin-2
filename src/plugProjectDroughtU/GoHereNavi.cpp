@@ -100,15 +100,14 @@ void NaviGoHereState::init(Navi* player, StateArg* arg)
 {
 	P2ASSERT(arg);
 	NaviGoHereStateArg* goHereArg = static_cast<NaviGoHereStateArg*>(arg);
-	
 
 	player->startMotion(IPikiAnims::WALK, IPikiAnims::WALK, nullptr, nullptr);
 	player->setMoveRotation(true);
 
 	mTargetPosition = goHereArg->mPosition;
 
-	mPath.swap(goHereArg->mPath);	
-	
+	mPath.swap(goHereArg->mPath);
+
 	mActiveRouteNodeIndex = 0;
 	mLastPosition         = player->getPosition();
 	mTimeoutTimer         = 0.0f;
@@ -184,13 +183,13 @@ void NaviGoHereState::exec(Navi* player)
 		if (distanceBetweenLast <= 1.5f) {
 			mTimeoutTimer += sys->mDeltaTime;
 
-			// If the player presses a button, or we've been trying for a while, give up
-			bool isAnyInput = player->mController1 && player->mController1->isAnyInput();
-			if (isAnyInput || mTimeoutTimer >= 2.5f) {
-				// The player change sound triggers if input is pressed, otherwise the damage sound triggers
-				changeState(player, isAnyInput);
+			// If we've been trying for a while, give up
+			if (mTimeoutTimer >= 2.5f) {
+				changeState(player, false);
 				return;
 			}
+		} else {
+			mTimeoutTimer = 0.0f;
 		}
 	}
 
@@ -433,7 +432,6 @@ void NaviGoHereState::changeState(Navi* player, bool isWanted)
 void Navi::doDirectDraw(Graphics& gfx)
 {
 #if GO_HERE_NAVI_DEBUG
-
 	if (getStateID() != NSID_GoHere) {
 		return;
 	}

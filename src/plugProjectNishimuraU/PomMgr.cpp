@@ -32,10 +32,43 @@ EnemyBase* Mgr::birth(EnemyBirthArg& birthArg)
 	if (gameSystem && gameSystem->mIsInCave && gameSystem->isStoryMode()) {
 		GameSystem* gs = gameSystem;
 
-		if (birthArg.mTypeID == EnemyTypeID::EnemyID_BluePom) { // BLUE CANDYPOP
+		if (birthArg.mTypeID == EnemyTypeID::EnemyID_BlackPom) { // PURPLE CANDYPOP
+			BaseGameSection* section = gs->mSection;
+
+			// Emergence cave
+			if (section && (section->getCurrFloor() < 2 || section->getCaveID() == 't_01')) {
+				const s32 cavePikis = playData->mCaveSaveData.mCavePikis.getColorSum(Purple);
+				const s32 purpPikis = GameStat::getAllPikmins(Purple);
+
+				// Don't generate if above 20 purple Pikmin
+				if (purpPikis + cavePikis >= 20) {
+					return nullptr;
+				}
+			}
+		} else if (birthArg.mTypeID == EnemyTypeID::EnemyID_WhitePom) { // WHITE CANDYPOP
+			BaseGameSection* section = gs->mSection;
+
+			if (section) {
+				if (playData->hasMetPikmin(White)) {
+					// White flower garden
+					if (section->getCurrFloor() < 2 || section->getCaveID() == 'f_02') {
+						const s32 cavePikis  = playData->mCaveSaveData.mCavePikis.getColorSum(White);
+						const s32 whitePikis = GameStat::getAllPikmins(White);
+
+						// Don't generate if above 20 white Pikmin
+						if (whitePikis + cavePikis >= 20) {
+							return nullptr;
+						}
+					}
+				} else if (section->getCaveID() != 'f_02') {
+					return nullptr;
+				}
+			}
+		} else if (birthArg.mTypeID == EnemyTypeID::EnemyID_BluePom) { // BLUE CANDYPOP
 			if (!playData->hasMetPikmin(Blue)) {
 				return nullptr;
 			}
+
 		} else if (birthArg.mTypeID == EnemyTypeID::EnemyID_YellowPom) { // YELLOW CANDYPOP
 			if (!playData->hasMetPikmin(Yellow)) {
 				return nullptr;
@@ -50,7 +83,10 @@ EnemyBase* Mgr::birth(EnemyBirthArg& birthArg)
  * @note Address: 0x802540D0
  * @note Size: 0x48
  */
-void Mgr::doAlloc() { init(new Parms); }
+void Mgr::doAlloc()
+{
+	init(new Parms);
+}
 
 /**
  * @note Address: 0x802542E0
@@ -76,7 +112,10 @@ void Mgr::createObj(int count)
  * @note Address: 0x80254524
  * @note Size: 0x10
  */
-EnemyBase* Mgr::getEnemy(int index) { return &mObj[index]; }
+EnemyBase* Mgr::getEnemy(int index)
+{
+	return &mObj[index];
+}
 
 /**
  * @note Address: 0x80254534

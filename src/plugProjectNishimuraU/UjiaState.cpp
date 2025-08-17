@@ -53,7 +53,9 @@ void StateDead::exec(EnemyBase* enemy)
  * @note Address: 0x80264B90
  * @note Size: 0x4
  */
-void StateDead::cleanup(EnemyBase* enemy) { }
+void StateDead::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x80264B94
@@ -83,7 +85,9 @@ void StatePress::exec(EnemyBase* enemy)
  * @note Address: 0x80264C3C
  * @note Size: 0x4
  */
-void StatePress::cleanup(EnemyBase* enemy) { }
+void StatePress::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x80264C40
@@ -253,41 +257,18 @@ void StateMove::exec(EnemyBase* enemy)
 	} else {
 		Creature* target = uji->mTargetCreature;
 		if (target && target->isAlive()) {
-			f32 rotSpeed = CG_GENERALPARMS(uji).mMaxTurnAngle();
-			f32 rotAccel = CG_GENERALPARMS(uji).mTurnSpeed();
 
-			Vector3f ujiPos    = uji->getPosition();
-			Vector3f targetPos = target->getPosition();
-
-			f32 angBetween = roundAng(JMAAtan2Radian(ujiPos.x - targetPos.x, ujiPos.z - targetPos.z));
-			f32 angleDist  = angDist(angBetween, uji->getFaceDir());
-
-			f32 limit     = TORADIANS(rotSpeed);
-			f32 turnSpeed = angleDist * rotAccel;
-			if (absF(turnSpeed) > limit) {
-				turnSpeed = (turnSpeed > 0.0f) ? limit : -limit;
-			}
-
-			uji->mFaceDir    = roundAng(turnSpeed + uji->getFaceDir());
-			uji->mRotation.y = uji->mFaceDir;
-			// uji->turnToTarget(target, CG_GENERALPARMS(uji).mTurnSpeed.mValue,
-			// CG_GENERALPARMS(uji).mMaxTurnAngle.mValue); uji->changeFaceDir(target);
-			f32 speed = CG_GENERALPARMS(uji).mMoveSpeed.mValue;
-
-			f32 sinTheta = sinf_kludge(uji->getFaceDir());
-			f32 y        = uji->getTargetVelocity().y;
-			f32 cosTheta = cosf_kludge(uji->getFaceDir());
-
-			uji->mTargetVelocity = Vector3f(speed * sinTheta, y, speed * cosTheta);
+			f32 angleDist = uji->changeFaceDir(target);
+			uji->setTargetVelocity();
 
 			if (uji->isTargetWithinRange(target, angleDist, CG_GENERALPARMS(uji).mPrivateRadius(), CG_GENERALPARMS(uji).mSightRadius(),
-			                             CG_GENERALPARMS(uji).mFov(), uji->mFaceDir)) {
+			                             CG_GENERALPARMS(uji).mFov(), angleDist)) {
 				uji->mTargetCreature = nullptr;
 			} else {
-				Vector3f deltaPosition = uji->getPosition() - uji->mHomePosition;
-				f32 distance           = deltaPosition.length();
-				f32 radius             = CG_GENERALPARMS(uji).mTerritoryRadius();
-				if (distance > radius) {
+				Vector3f deltaPosition = uji->mHomePosition;
+				deltaPosition -= uji->getPosition();
+				f32 distance = deltaPosition.length();
+				if (distance > CG_GENERALPARMS(uji).mTerritoryRadius()) {
 					uji->mTargetCreature = nullptr;
 				}
 			}
@@ -648,7 +629,9 @@ lbl_8026558C:
  * @note Address: 0x802655E0
  * @note Size: 0x4
  */
-void StateMove::cleanup(EnemyBase* enemy) { }
+void StateMove::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x802655E4
@@ -694,7 +677,9 @@ void StateMoveSide::exec(EnemyBase* enemy)
  * @note Address: 0x8026570C
  * @note Size: 0x4
  */
-void StateMoveSide::cleanup(EnemyBase* enemy) { }
+void StateMoveSide::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x80265710
@@ -740,7 +725,9 @@ void StateMoveCentre::exec(EnemyBase* enemy)
  * @note Address: 0x80265838
  * @note Size: 0x4
  */
-void StateMoveCentre::cleanup(EnemyBase* enemy) { }
+void StateMoveCentre::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8026583C
@@ -786,7 +773,9 @@ void StateMoveTop::exec(EnemyBase* enemy)
  * @note Address: 0x80265964
  * @note Size: 0x4
  */
-void StateMoveTop::cleanup(EnemyBase* enemy) { }
+void StateMoveTop::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x80265968
@@ -834,7 +823,9 @@ void StateGoHome::exec(EnemyBase* enemy)
  * @note Address: 0x80265B34
  * @note Size: 0x4
  */
-void StateGoHome::cleanup(EnemyBase* enemy) { }
+void StateGoHome::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x80265B38
@@ -887,7 +878,9 @@ void StateAttack1::exec(EnemyBase* enemy)
  * @note Address: 0x80265C9C
  * @note Size: 0x4
  */
-void StateAttack1::cleanup(EnemyBase* enemy) { }
+void StateAttack1::cleanup(EnemyBase* enemy)
+{
+}
 
 } // namespace Ujia
 } // namespace Game

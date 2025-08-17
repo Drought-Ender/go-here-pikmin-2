@@ -7,8 +7,8 @@
 
 #include "GenericObjectMgr.h"
 #include "Game/routeMgr.h"
-#include "Game/MoveInfo.h"
 #include "MapCollision.h"
+#include "Game/MoveInfo.h"
 #include "Vector3.h"
 
 struct BoundBox;
@@ -174,8 +174,8 @@ extern f32 gMapRotation;
 inline bool isTriangleAt(const Vector3f& position)
 {
 	Game::CurrTriInfo info;
-	info.mGetTopPolygonInfo = false;
-	info.mPosition          = position;
+	info.mUpdateOnNewMaxY = false;
+	info.mPosition        = position;
 	mapMgr->getCurrTri(info);
 	return info.mTriangle != nullptr;
 }

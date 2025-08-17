@@ -43,7 +43,10 @@ void JASIntrMgr::setIntr(u32 interrupt, void* data)
  * @note Address: 0x800A2A84
  * @note Size: 0x18
  */
-void JASIntrMgr::resetInter(u32 interrupt) { mIntrFlag &= ~(1 << interrupt); }
+void JASIntrMgr::resetInter(u32 interrupt)
+{
+	mIntrFlag &= ~(1 << interrupt);
+}
 
 /**
  * @note Address: 0x800A2A9C
@@ -78,9 +81,7 @@ void JASIntrMgr::timerProcess()
 	}
 
 	// timer is newly 0
-	if (mIntrFlag & 0x40) {
-		mRequestFlag |= 0x40;
-	}
+	request(6);
 	if (mTimerCount) {
 		mTimerCount--;
 		if (mTimerCount == 0) {

@@ -284,7 +284,10 @@ void FSMItem<ItemClass, FSMClass, StateClass>::platCallback(PlatEvent& event)
 
 // defined here to avoid include loop
 namespace efx {
-inline Arg::Arg(Game::BaseItem* item) { mPosition = item->mPosition; }
+inline Arg::Arg(Game::BaseItem* item)
+{
+	mPosition = item->mPosition;
+}
 } // namespace efx
 
 #endif

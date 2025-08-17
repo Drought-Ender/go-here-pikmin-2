@@ -27,7 +27,10 @@ bool RoomMapMgr::mUseCylinderViewCulling = false;
  * @note Address: 0x801B6468
  * @note Size: 0x24
  */
-Door* MapUnitInterface::getDoor(int idx) { return (Door*)mDoor.getChildAt(idx); }
+Door* MapUnitInterface::getDoor(int idx)
+{
+	return (Door*)mDoor.getChildAt(idx);
+}
 
 /**
  * @note Address: 0x801B648C
@@ -43,7 +46,10 @@ void MapUnitInterface::getCellSize(int& x, int& y)
  * @note Address: 0x801B64A8
  * @note Size: 0x24
  */
-DoorLink* Door::getLink(int idx) { return static_cast<DoorLink*>(mRootLink.getChildAt(idx)); }
+DoorLink* Door::getLink(int idx)
+{
+	return static_cast<DoorLink*>(mRootLink.getChildAt(idx));
+}
 
 /**
  * @note Address: N/A
@@ -87,7 +93,10 @@ void Door::write(Stream& stream)
 	stream.textWriteText("\t# dir/offs/wpindex\r\n");
 
 	stream.textWriteTab(stream.mTabCount);
-	FOREACH_NODE(DoorLink, mRootLink.mChild, link) { link->write(stream); }
+	FOREACH_NODE(DoorLink, mRootLink.mChild, link)
+	{
+		link->write(stream);
+	}
 	stream.textWriteText("\t# door links\r\n");
 }
 
@@ -413,7 +422,7 @@ void MapRoom::placeObjects(Cave::FloorInfo* floorInfo, bool isFinalFloor)
 					triInfo.mPosition = birthPos;
 					f32 minY          = 0.0f;
 					if (mapMgr) {
-						triInfo.mGetTopPolygonInfo = 0;
+						triInfo.mUpdateOnNewMaxY = 0;
 						mapMgr->getCurrTri(triInfo);
 						minY = triInfo.mMinY;
 					}
@@ -602,7 +611,9 @@ RoomDoorInfo* MapRoom::createDoorInfo(MapUnitInterface*)
  * @note Address: 0x801B76E4
  * @note Size: 0x4
  */
-RoomDoorInfo::RoomDoorInfo() { }
+RoomDoorInfo::RoomDoorInfo()
+{
+}
 
 /**
  * @note Address: 0x801B76E8
@@ -729,19 +740,26 @@ void MapRoom::doSetView(int viewportNumber)
  * @note Address: 0x801B7AD4
  * @note Size: 0x24
  */
-void MapRoom::doViewCalc() { mModel->viewCalc(); }
+void MapRoom::doViewCalc()
+{
+	mModel->viewCalc();
+}
 
 /**
  * @note Address: 0x801B7AF8
  * @note Size: 0x4
  */
-void MapRoom::doSimulation(f32) { }
+void MapRoom::doSimulation(f32)
+{
+}
 
 /**
  * @note Address: 0x801B7AFC
  * @note Size: 0x4
  */
-void MapRoom::doDirectDraw(Graphics&) { }
+void MapRoom::doDirectDraw(Graphics&)
+{
+}
 
 /**
  * @note Address: 0x801B7B00
@@ -787,7 +805,10 @@ MapRoom* RoomMapMgr::getMapRoom(s16 idx)
  * @note Address: 0x801B7FD0
  * @note Size: 0xC
  */
-CaveVRBox::CaveVRBox() { mModel = nullptr; }
+CaveVRBox::CaveVRBox()
+{
+	mModel = nullptr;
+}
 
 /**
  * @note Address: N/A
@@ -1812,7 +1833,10 @@ void RoomMapMgr::allocRooms(int count)
 {
 	mRoomMgr.alloc(count);
 	Iterator<MapRoom> iter(&mRoomMgr);
-	CI_LOOP(iter) { (*iter)->mIndex = -1; }
+	CI_LOOP(iter)
+	{
+		(*iter)->mIndex = -1;
+	}
 }
 
 /**
@@ -2159,13 +2183,18 @@ void RoomMapMgr::getBoundBox2d(BoundBox2d& boundbox)
  * @note Address: 0x801B9B68
  * @note Size: 0x34
  */
-void RoomMapMgr::getBoundBox(BoundBox& boundbox) { boundbox = mBoundbox; }
+void RoomMapMgr::getBoundBox(BoundBox& boundbox)
+{
+	boundbox = mBoundbox;
+}
 
 /**
  * @note Address: 0x801B9B9C
  * @note Size: 0x4
  */
-void RoomMapMgr::drawCollision(Graphics&, Sys::Sphere&) { }
+void RoomMapMgr::drawCollision(Graphics&, Sys::Sphere&)
+{
+}
 
 /**
  * @note Address: 0x801B9BA0
@@ -2368,7 +2397,10 @@ lbl_801B9D70:
  * @note Address: 0x801B9D90
  * @note Size: 0x24
  */
-bool RoomMapMgr::hasHiddenCollision() { return mFloorInfo->hasHiddenCollision(); }
+bool RoomMapMgr::hasHiddenCollision()
+{
+	return mFloorInfo->hasHiddenCollision();
+}
 
 /**
  * @note Address: 0x801B9DB4
@@ -4254,8 +4286,8 @@ bool RoomMapMgr::findRayIntersection(Sys::RayIntersectInfo& info)
 f32 RoomMapMgr::getMinY(Vector3f& pos)
 {
 	CurrTriInfo info;
-	info.mPosition          = pos;
-	info.mGetTopPolygonInfo = 0;
+	info.mPosition        = pos;
+	info.mUpdateOnNewMaxY = 0;
 	getCurrTri(info);
 	return info.mMinY;
 }
@@ -4896,7 +4928,7 @@ void RoomMapMgr::getCurrTri(CurrTriInfo& info)
 				f32 height = pos.y;
 				if (info.mMaxY > height) {
 					info.mMaxY = height;
-					if (info.mGetTopPolygonInfo) {
+					if (info.mUpdateOnNewMaxY) {
 						info.mTriangle  = tri;
 						info.mNormalVec = tri->mTrianglePlane.mNormal;
 						info.mNormalVec = room->mInvRoomSpaceMtx.multTranspose(info.mNormalVec);
@@ -4905,7 +4937,7 @@ void RoomMapMgr::getCurrTri(CurrTriInfo& info)
 
 				if (info.mMinY < height) {
 					info.mMinY = height;
-					if (!info.mGetTopPolygonInfo) {
+					if (!info.mUpdateOnNewMaxY) {
 						info.mTriangle  = tri;
 						info.mNormalVec = tri->mTrianglePlane.mNormal;
 						info.mNormalVec = room->mInvRoomSpaceMtx.multTranspose(info.mNormalVec);
@@ -6997,7 +7029,9 @@ void RoomMapMgr::doViewCalc()
  * @note Address: 0x801BE474
  * @note Size: 0x4
  */
-void RoomMapMgr::doSimulation(f32) { }
+void RoomMapMgr::doSimulation(f32)
+{
+}
 
 /**
  * @note Address: 0x801BE478
@@ -7007,7 +7041,10 @@ void RoomMapMgr::doDirectDraw(Graphics& gfx)
 {
 	gfx.initPrimDraw(nullptr);
 	Iterator<MapRoom> iter(&mRoomMgr);
-	CI_LOOP(iter) { (*iter)->doDirectDraw(gfx); }
+	CI_LOOP(iter)
+	{
+		(*iter)->doDirectDraw(gfx);
+	}
 }
 
 } // namespace Game

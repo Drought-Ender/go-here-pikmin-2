@@ -367,7 +367,10 @@ int JASSeqParser::cmdCheckPortExport(JASTrack* track, u32* args)
  * @note Address: 0x8009CFE4
  * @note Size: 0x18
  */
-int JASSeqParser::cmdWait(JASTrack* track, u32* args) { return (track->getSeq()->mWaitTimer = args[0]) != 0; }
+int JASSeqParser::cmdWait(JASTrack* track, u32* args)
+{
+	return (track->getSeq()->mWaitTimer = args[0]) != 0;
+}
 
 /**
  * @note Address: 0x8009CFFC
@@ -591,13 +594,19 @@ int JASSeqParser::cmdSyncCPU(JASTrack* track, u32* args)
  * @note Address: 0x8009D3B8
  * @note Size: 0x8
  */
-int JASSeqParser::cmdFlushAll(JASTrack*, u32*) { return 0x0; }
+int JASSeqParser::cmdFlushAll(JASTrack*, u32*)
+{
+	return 0x0;
+}
 
 /**
  * @note Address: 0x8009D3C0
  * @note Size: 0x8
  */
-int JASSeqParser::cmdFlushRelease(JASTrack*, u32*) { return 0x0; }
+int JASSeqParser::cmdFlushRelease(JASTrack*, u32*)
+{
+	return 0x0;
+}
 
 /**
  * @note Address: 0x8009D3C8
@@ -623,13 +632,19 @@ int JASSeqParser::cmdTempo(JASTrack* track, u32* args)
  * @note Address: 0x8009D428
  * @note Size: 0x8
  */
-int JASSeqParser::cmdFinish(JASTrack*, u32*) { return 0x3; }
+int JASSeqParser::cmdFinish(JASTrack*, u32*)
+{
+	return 0x3;
+}
 
 /**
  * @note Address: 0x8009D430
  * @note Size: 0x8
  */
-int JASSeqParser::cmdNop(JASTrack*, u32*) { return 0x0; }
+int JASSeqParser::cmdNop(JASTrack*, u32*)
+{
+	return 0x0;
+}
 
 /**
  * @note Address: 0x8009D438
@@ -805,12 +820,12 @@ int JASSeqParser::cmdPrintf(JASTrack* track, u32* args)
 	u32 count = 0;
 
 	for (u32 i = 0; i < 128; i++) {
-		buf[i] = *track->getSeq()->mCurrentFilePtr++;
+		buf[i] = track->getSeq()->readByte();
 		if (!buf[i]) {
 			break;
 		}
 		if (buf[i] == '\\') {
-			buf[i] = *track->getSeq()->mCurrentFilePtr++;
+			buf[i] = track->getSeq()->readByte();
 			if (!buf[i]) {
 				break;
 			}
@@ -828,7 +843,7 @@ int JASSeqParser::cmdPrintf(JASTrack* track, u32* args)
 			continue;
 		}
 
-		buf[++i] = *track->getSeq()->mCurrentFilePtr++;
+		buf[++i] = track->getSeq()->readByte();
 		if (!buf[i]) {
 			break;
 		}
@@ -860,7 +875,7 @@ int JASSeqParser::cmdPrintf(JASTrack* track, u32* args)
 	}
 
 	for (u32 i = 0; i < count; i++) {
-		registers[i] = *track->getSeq()->mCurrentFilePtr++;
+		registers[i] = track->getSeq()->readByte();
 		if (byteArray[i] == 2) {
 			registers[i] = (int)&track->getSeq()->mRawFilePtr[registers[i]];
 		} else if (byteArray[i] == 5) {
@@ -1082,7 +1097,7 @@ int JASSeqParser::cmdNoteOn(JASTrack* track, u8 note)
 			val24 = track->exchangeRegisterValue(val24 - 1);
 		}
 		if (val28 & 1) {
-			val23 = track->exchangeRegisterValue(*ctrl->mCurrentFilePtr++);
+			val23 = track->exchangeRegisterValue(ctrl->readByte());
 			val28 ^= 1;
 		}
 

@@ -12,7 +12,9 @@ static const int someSMenuMapArray[] = { 0, 0, 0 };
  * @note Address: 0x80312BFC
  * @note Size: 0x50
  */
-SMenuMap::SMenuMap() { }
+SMenuMap::SMenuMap()
+{
+}
 
 /**
  * @note Address: 0x80312C4C
@@ -74,7 +76,9 @@ void SMenuMap::doCreateObj(JKRArchive* archive)
  * @note Address: 0x80312E14
  * @note Size: 0x4
  */
-void SMenuMap::doUpdateActive() { }
+void SMenuMap::doUpdateActive()
+{
+}
 
 /**
  * @note Address: 0x80312E18
@@ -104,7 +108,10 @@ bool SMenuMap::doConfirmSetScene(::Screen::SetSceneArg& sceneArg)
  * @note Address: 0x80312E80
  * @note Size: 0xC
  */
-void SMenuMap::doSetBackupScene(::Screen::SetSceneArg& sceneArg) { sceneArg.mDoCreateBackup = false; }
+void SMenuMap::doSetBackupScene(::Screen::SetSceneArg& sceneArg)
+{
+	sceneArg.mDoCreateBackup = false;
+}
 
 static const char DONOTDOTHAT[] = "だめです"; // 'do not do that' lmao
 

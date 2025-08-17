@@ -124,7 +124,10 @@ void CaveState::gameStart(SingleGameSection* game)
  * @note Address: 0x80217A64
  * @note Size: 0xC
  */
-void CaveState::on_section_fadeout(SingleGameSection*) { mFadeout = true; }
+void CaveState::on_section_fadeout(SingleGameSection*)
+{
+	mFadeout = true;
+}
 
 /**
  * @note Address: 0x80217A70
@@ -173,7 +176,7 @@ void CaveState::exec(SingleGameSection* game)
 			Navi* navi = naviMgr->getActiveNavi();
 			if (!navi) {
 				int id = NAVIID_Louie;
-				if (gameSystem->mSection->mCurrentPlayerIndex == NAVIID_Olimar) {
+				if (gameSystem->mSection->mPrevNaviIdx == NAVIID_Olimar) {
 					id = NAVIID_Olimar;
 				}
 				navi = naviMgr->getAt(id);

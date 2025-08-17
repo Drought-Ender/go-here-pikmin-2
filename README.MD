@@ -1,5 +1,5 @@
 Pikmin 2  
-[![Build Status]][actions] [![Code Progress]][progress] [![Data Progress]][progress] [![Linked Progress]][progress]
+[![Build Status]][actions] [![Code Progress]][progress] [![Data Progress]][progress] [![Linked Progress]][progress] [![Discord Badge]][discord]
 =============
 
 [Build Status]: https://github.com/projectPiki/pikmin2/actions/workflows/build.yml/badge.svg
@@ -8,6 +8,7 @@ Pikmin 2
 [Data Progress]: https://decomp.dev/projectPiki/pikmin2.svg?mode=shield&measure=data&label=Data&category=all
 [Linked Progress]: https://decomp.dev/projectPiki/pikmin2.svg?mode=shield&measure=complete_code&label=Linked%20Code&category=all
 [Discord Badge]: https://img.shields.io/discord/933849697485983765?color=%237289DA&logo=discord&logoColor=%23FFFFFF
+[discord]: https://discord.gg/CWKqYMePX8
 [progress]: https://decomp.dev/projectPiki/pikmin2
 
 A mod of Pikmin 2 that adds the go-here functionality found in Pikmin 3.
@@ -19,7 +20,7 @@ Index
   - [Windows](#windows)
   - [macOS](#macos)
   - [Linux](#linux)
-- [Installation](#installation)
+- [Building](#building)
 
 Dependencies
 ------------
@@ -59,13 +60,13 @@ sudo xattr -rd com.apple.quarantine '/Applications/Wine Crossover.app'
 - For non-x86(_64) platforms: Install wine from your package manager.
   - For x86(_64), [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
-Installation
+Building
 --------
 
 - Clone the repository:
 
   ```sh
-  git clone https://github.com/projectPiki/pikmin2.git
+  git clone https://github.com/Drought-Ender/go-here-pikmin-2.git
   ```
 
 - Using [Dolphin Emulator](https://dolphin-emu.org/), extract your game's system data to `orig/GPVE01`. (Or `orig/GPVE01_D17` for demo)
@@ -77,14 +78,14 @@ Installation
 
 - Configure:
 
-```sh
-python configure.py --non-matching
-```
+  ```sh
+  python configure.py --non-matching
+  ```
 
 - Build:
 
-```sh
-ninja
-```
+  ```sh
+  ninja
+  ```
 
 Once built with `ninja`, the new DOL will exist at `build/GPVE01/main.dol`. Copy this to your extracted games `sys/` folder, overwriting the old one. You are now ready to play, test, and develop the mod.

@@ -17,7 +17,10 @@ Action::Action(Game::Piki* piki)
  * @note Address: 0x80196A34
  * @note Size: 0x30
  */
-void Action::getInfo(char* dest) { sprintf(dest, "%s", mName); }
+void Action::getInfo(char* dest)
+{
+	sprintf(dest, "%s", mName);
+}
 
 /**
  * @note Address: 0x80196A64
@@ -50,7 +53,10 @@ Brain::Brain(Game::Piki* piki)
  * @note Address: 0x80196CE4
  * @note Size: 0x1C
  */
-void Brain::addAction(Action* action) { mActions[mActionCnt++] = action; }
+void Brain::addAction(Action* action)
+{
+	mActions[mActionCnt++] = action;
+}
 
 /**
  * @note Address: 0x80196D00
@@ -227,7 +233,7 @@ Game::Navi* Brain::searchOrima()
 					searchRadius = distToPlayer;
 					targetPlayer = currentPlayer;
 
-				} else if (Game::gameSystem->mSection->mCurrentPlayerIndex == NAVIID_Olimar) {
+				} else if (Game::gameSystem->mSection->mPrevNaviIdx == NAVIID_Olimar) {
 					if (currentPlayer->mNaviIndex == NAVIID_Olimar) {
 						searchRadius = distToPlayer;
 						targetPlayer = currentPlayer;

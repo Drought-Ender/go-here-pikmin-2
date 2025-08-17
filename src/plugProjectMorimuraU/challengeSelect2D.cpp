@@ -1066,7 +1066,10 @@ lbl_8038CB44:
  * @note Address: N/A
  * @note Size: 0x34
  */
-void TChallengePanel::startScaleUp() { mScaleMgr->up(0.3f, 30.0f, 0.6f, 0.0f); }
+void TChallengePanel::startScaleUp()
+{
+	mScaleMgr->up(0.3f, 30.0f, 0.6f, 0.0f);
+}
 
 /**
  * @note Address: 0x8038CCC8
@@ -1186,7 +1189,10 @@ void TChallengeScreen::updateBckPane()
  * @note Address: 0x8038D43C
  * @note Size: 0x20
  */
-bool TChallengeScreen::isRandAnimStart() { return mAnimPanes[0]->mCurrentFrame == 2.0f; }
+bool TChallengeScreen::isRandAnimStart()
+{
+	return mAnimPanes[0]->mCurrentFrame == 2.0f;
+}
 
 /**
  * @note Address: 0x8038D45C
@@ -2027,7 +2033,9 @@ void TChallengeSelectExplanationWindow::create(char const* path, u32 flags)
  * @note Address: 0x8038E9B4
  * @note Size: 0x4
  */
-void TChallengeSelectExplanationWindow::screenScaleUp() { }
+void TChallengeSelectExplanationWindow::screenScaleUp()
+{
+}
 
 /**
  * @note Address: 0x8038E9B8
@@ -2087,7 +2095,10 @@ TChallengeSelect::TChallengeSelect()
  * @note Size: 0x44
  * Probably something like this
  */
-void TChallengeSelect::setDebugHeapParent(JKRHeap* heap) { mDebugHeap = static_cast<JKRExpHeap*>(heap); }
+void TChallengeSelect::setDebugHeapParent(JKRHeap* heap)
+{
+	mDebugHeap = static_cast<JKRExpHeap*>(heap);
+}
 
 /**
  * @note Address: 0x8038EBE8
@@ -4328,24 +4339,24 @@ void TChallengeSelect::doDraw(Graphics& gfx)
 		if (rulestate) {
 			drawBg = true;
 			if (rulestate == 3) {
-				mBgAlpha += 20;
-				if (mBgAlpha > 200) {
-					mBgAlpha = 200;
-				}
-			} else {
 				if (mBgAlpha > 25) {
 					mBgAlpha -= 25;
 				} else {
 					mBgAlpha = 0;
 				}
+			} else {
+				mBgAlpha += 20;
+			}
+			if (mBgAlpha > 200) {
+				mBgAlpha = 200;
 			}
 		} else {
 			rulestate = mPlayModeScreen->mState;
 			if (!mPlayModeScreen->isState(0)) {
 				drawBg = true;
 				if (rulestate == 3) {
-					if (mBgAlpha > 25) {
-						mBgAlpha -= 25;
+					if (mBgAlpha > 30) {
+						mBgAlpha -= 30;
 					} else {
 						mBgAlpha = 0;
 					}
@@ -4364,8 +4375,8 @@ void TChallengeSelect::doDraw(Graphics& gfx)
 
 	if (drawBg) {
 		JUtility::TColor color1;
-		color1.set(50, 0, 0, 0);
-		color1.a = 255 - mBgAlpha;
+		color1.set(0, 0, 80, 0);
+		color1.a = mBgAlpha;
 		graf->setColor(color1);
 		GXSetAlphaUpdate(GX_FALSE);
 		u32 y    = System::getRenderModeObj()->efbHeight;
@@ -4984,13 +4995,19 @@ int TChallengeSelect::getIndexMax()
  * @note Address: 0x80392B20
  * @note Size: 0x24
  */
-void TChallengeSelect::openWindow() { mRulesScreen->openWindow(); }
+void TChallengeSelect::openWindow()
+{
+	mRulesScreen->openWindow();
+}
 
 /**
  * @note Address: 0x80392B44
  * @note Size: 0x24
  */
-void TChallengeSelect::closeWindow() { mRulesScreen->closeWindow(); }
+void TChallengeSelect::closeWindow()
+{
+	mRulesScreen->closeWindow();
+}
 
 /**
  * @note Address: 0x80392B68

@@ -53,7 +53,7 @@ void NaviWhistle::updatePosition()
 	info.mPosition = mPosition;
 	if (mapMgr) {
 		// If we have a map manager, get the current triangle
-		info.mGetTopPolygonInfo = false;
+		info.mUpdateOnNewMaxY = false;
 		mapMgr->getCurrTri(info);
 		y       = info.mMinY;
 		mNormal = info.mNormalVec;
@@ -120,7 +120,10 @@ void NaviWhistle::stop()
  * @note Address: 0x80165420
  * @note Size: 0x10
  */
-bool NaviWhistle::timeout() { return mState == WS_Idle; }
+bool NaviWhistle::timeout()
+{
+	return mState == WS_Idle;
+}
 
 /**
  * @note Address: 0x80165430

@@ -55,7 +55,9 @@ void StateDead::exec(EnemyBase* enemy)
  * @note Address: 0x8025B6C0
  * @note Size: 0x4
  */
-void StateDead::cleanup(EnemyBase* enemy) { }
+void StateDead::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025B6C4
@@ -85,7 +87,9 @@ void StatePress::exec(EnemyBase* enemy)
  * @note Address: 0x8025B76C
  * @note Size: 0x4
  */
-void StatePress::cleanup(EnemyBase* enemy) { }
+void StatePress::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025B770
@@ -239,85 +243,45 @@ void StateMove::init(EnemyBase* enemy, StateArg* stateArg)
 void StateMove::exec(EnemyBase* enemy)
 {
 	Obj* uji         = OBJ(enemy);
-	Creature* target = EnemyFunc::getNearestPikminOrNavi(uji, CG_GENERALPARMS(uji).mViewAngle.mValue,
-	                                                     CG_GENERALPARMS(uji).mSightRadius.mValue, nullptr, nullptr, nullptr);
+	Creature* target = EnemyFunc::getNearestPikminOrNavi(uji, CG_GENERALPARMS(uji).mViewAngle(), CG_GENERALPARMS(uji).mSightRadius(),
+	                                                     nullptr, nullptr, nullptr);
 
 	if (target) {
 		uji->mTargetCreature = target;
-		// Creature* target = uji->mTargetCreature;
-		// if (target && target->isAlive()) {
-		f32 rotSpeed = CG_GENERALPARMS(uji).mMaxTurnAngle();
-		f32 rotAccel = CG_GENERALPARMS(uji).mTurnSpeed();
+		f32 angleDist        = uji->changeFaceDir(target);
+		uji->setTargetVelocity();
 
-		Vector3f ujiPos    = uji->getPosition();
-		Vector3f targetPos = target->getPosition();
-
-		f32 angBetween = roundAng(JMAAtan2Radian(ujiPos.x - targetPos.x, ujiPos.z - targetPos.z));
-		f32 angleDist  = angDist(angBetween, uji->getFaceDir());
-
-		f32 limit     = PI * (DEG2RAD * rotSpeed);
-		f32 turnSpeed = angleDist * rotAccel;
-		if (FABS(turnSpeed) > limit) {
-			turnSpeed = (turnSpeed > 0.0f) ? limit : -limit;
+		bool finish = false;
+		if (uji->isTargetWithinRange(target, angleDist, CG_GENERALPARMS(uji).mMaxAttackAngle(), CG_GENERALPARMS(uji).mMaxAttackRange(),
+		                             angleDist, angleDist)) {
+			finish = true;
 		}
 
-		uji->mFaceDir    = roundAng(turnSpeed + uji->getFaceDir());
-		uji->mRotation.y = uji->mFaceDir;
-		// uji->turnToTarget(target, CG_GENERALPARMS(uji).mTurnSpeed.mValue, CG_GENERALPARMS(uji).mMaxTurnAngle.mValue);
-		// uji->changeFaceDir(target);
-		f32 speed = CG_GENERALPARMS(uji).mMoveSpeed.mValue;
-
-		f32 sinTheta = (f32)sin(uji->getFaceDir());
-		f32 y        = uji->getTargetVelocity().y;
-		f32 cosTheta = (f32)cos(uji->getFaceDir());
-
-		uji->mTargetVelocity = Vector3f(speed * sinTheta, y, speed * cosTheta);
-
-		f32 sightRad  = CG_GENERALPARMS(uji).mSightRadius(); // f30
-		f32 fov       = CG_GENERALPARMS(uji).mFov();         // f25
-		f32 viewAngle = CG_GENERALPARMS(uji).mViewAngle();   // f26
-
-		f32 xDiff = target->getPosition().x - uji->getPosition().x;
-		f32 yDiff = target->getPosition().y - uji->getPosition().y;
-		f32 zDiff = target->getPosition().z - uji->getPosition().z;
-
-		f32 rad1    = SQUARE(viewAngle);
-		f32 rad2    = SQUARE(sightRad);
-		f32 sqrDiff = SQUARE(xDiff) + SQUARE(yDiff) + SQUARE(zDiff);
-		bool check0 = true;
-		bool check1 = false;
-		bool check2;
-		if (sqrDiff > rad1) {
-			check2 = false;
-			if (sqrDiff > rad2) {
-				if (FABS(yDiff) < fov) {
-					check2 = true;
-				}
-			}
-			if (check2) {
-				check1 = true;
-			}
-		}
-
-		if (!check1) {
-			if (!(FABS(angleDist) <= PI * (DEG2RAD * sightRad))) {
-				check0 = false;
-			}
-		}
-		if (check0) {
-			uji->mTargetCreature = nullptr;
+		if (finish) {
+			uji->mNextState = UJIB_Attack2;
+			uji->finishMotion();
 		} else {
-			Vector3f diff = uji->getPosition() - uji->mHomePosition;
-			f32 len       = diff.length();
+			Vector3f diff = uji->mHomePosition;
+			diff -= uji->getPosition();
+			f32 len = diff.length();
 			if (len > CG_GENERALPARMS(uji).mTerritoryRadius()) {
-				uji->mTargetCreature = nullptr;
+				uji->mNextState = UJIB_GoHome;
+				uji->finishMotion();
 			}
 		}
-
-		// } else {
-		// 	uji->mNextState = UJIB_GoHome;
-		// 	uji->finishMotion();
-		// }
+		if (EnemyFunc::getNearestPikminOrNavi(uji, CG_GENERALPARMS(uji).mMaxAttackAngle(), CG_GENERALPARMS(uji).mMaxAttackRange(), nullptr,
+		                                      nullptr, nullptr)) {
+			uji->mNextState = UJIB_Attack2;
+			uji->finishMotion();
+		}
+	} else {
+		if (uji->isBreakBridge()) {
+			uji->mNextState = (StateID)uji->checkBreakOrMove();
+			uji->finishMotion();
+		} else {
+			uji->mNextState = UJIB_GoHome;
+			uji->finishMotion();
+		}
 	}
 
 	uji->setInWaterDamage();
@@ -360,7 +324,7 @@ void StateMove::exec(EnemyBase* enemy)
 	li       r6, 0
 	lfs      f2, 0x3d4(r7)
 	bl
-"getNearestPikminOrNavi__Q24Game9EnemyFuncFPQ24Game8CreatureffPfP23Condition<Q24Game4Navi>P23Condition<Q24Game4Piki>"
+	"getNearestPikminOrNavi__Q24Game9EnemyFuncFPQ24Game8CreatureffPfP23Condition<Q24Game4Navi>P23Condition<Q24Game4Piki>"
 	or.      r28, r3, r3
 	beq      lbl_8025BF8C
 	stw      r28, 0x230(r31)
@@ -414,10 +378,10 @@ void StateMove::exec(EnemyBase* enemy)
 	fmr      f28, f1
 	b        lbl_8025BD10
 
-lbl_8025BD0C:
+	lbl_8025BD0C:
 	fneg     f28, f1
 
-lbl_8025BD10:
+	lbl_8025BD10:
 	mr       r3, r31
 	lwz      r12, 0(r31)
 	lwz      r12, 0x64(r12)
@@ -521,7 +485,7 @@ lbl_8025BD10:
 	bne      lbl_8025BEA8
 	li       r29, 1
 
-lbl_8025BEA8:
+	lbl_8025BEA8:
 	clrlwi.  r0, r29, 0x18
 	beq      lbl_8025BEC4
 	li       r0, 0xb
@@ -530,7 +494,7 @@ lbl_8025BEA8:
 	bl       finishMotion__Q24Game9EnemyBaseFv
 	b        lbl_8025BFC4
 
-lbl_8025BEC4:
+	lbl_8025BEC4:
 	mr       r4, r31
 	addi     r3, r1, 0x68
 	lwz      r12, 0(r31)
@@ -558,10 +522,10 @@ lbl_8025BEC4:
 	fmuls    f1, f0, f1
 	b        lbl_8025BF30
 
-lbl_8025BF2C:
+	lbl_8025BF2C:
 	fmr      f1, f0
 
-lbl_8025BF30:
+	lbl_8025BF30:
 	lwz      r4, 0xc0(r31)
 	lfs      f0, 0x35c(r4)
 	fcmpo    cr0, f1, f0
@@ -572,7 +536,7 @@ lbl_8025BF30:
 	bl       finishMotion__Q24Game9EnemyBaseFv
 	b        lbl_8025BFC4
 
-lbl_8025BF54:
+	lbl_8025BF54:
 	lfs      f1, 0x58c(r4)
 	mr       r3, r31
 	lfs      f2, 0x564(r4)
@@ -580,7 +544,7 @@ lbl_8025BF54:
 	li       r5, 0
 	li       r6, 0
 	bl
-"getNearestPikminOrNavi__Q24Game9EnemyFuncFPQ24Game8CreatureffPfP23Condition<Q24Game4Navi>P23Condition<Q24Game4Piki>"
+	"getNearestPikminOrNavi__Q24Game9EnemyFuncFPQ24Game8CreatureffPfP23Condition<Q24Game4Navi>P23Condition<Q24Game4Piki>"
 	cmplwi   r3, 0
 	beq      lbl_8025BFC4
 	li       r0, 0xb
@@ -589,7 +553,7 @@ lbl_8025BF54:
 	bl       finishMotion__Q24Game9EnemyBaseFv
 	b        lbl_8025BFC4
 
-lbl_8025BF8C:
+	lbl_8025BF8C:
 	mr       r3, r31
 	bl       isBreakBridge__Q34Game4Ujib3ObjFv
 	clrlwi.  r0, r3, 0x18
@@ -601,13 +565,13 @@ lbl_8025BF8C:
 	bl       finishMotion__Q24Game9EnemyBaseFv
 	b        lbl_8025BFC4
 
-lbl_8025BFB4:
+	lbl_8025BFB4:
 	li       r0, 9
 	mr       r3, r31
 	stw      r0, 0x2c4(r31)
 	bl       finishMotion__Q24Game9EnemyBaseFv
 
-lbl_8025BFC4:
+	lbl_8025BFC4:
 	mr       r3, r31
 	bl       setInWaterDamage__Q34Game4Ujib3ObjFv
 	lfs      f1, 0x200(r31)
@@ -625,7 +589,7 @@ lbl_8025BFC4:
 	bctrl
 	b        lbl_8025C040
 
-lbl_8025C004:
+	lbl_8025C004:
 	lwz      r3, 0x188(r31)
 	lbz      r0, 0x24(r3)
 	cmplwi   r0, 0
@@ -642,7 +606,7 @@ lbl_8025C004:
 	mtctr    r12
 	bctrl
 
-lbl_8025C040:
+	lbl_8025C040:
 	psq_l    f31, 232(r1), 0, qr0
 	lfd      f31, 0xe0(r1)
 	psq_l    f30, 216(r1), 0, qr0
@@ -670,7 +634,9 @@ lbl_8025C040:
  * @note Address: 0x8025C090
  * @note Size: 0x4
  */
-void StateMove::cleanup(EnemyBase* enemy) { }
+void StateMove::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C094
@@ -721,7 +687,9 @@ void StateMoveSide::exec(EnemyBase* enemy)
  * @note Address: 0x8025C1F8
  * @note Size: 0x4
  */
-void StateMoveSide::cleanup(EnemyBase* enemy) { }
+void StateMoveSide::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C1FC
@@ -772,7 +740,9 @@ void StateMoveCentre::exec(EnemyBase* enemy)
  * @note Address: 0x8025C360
  * @note Size: 0x4
  */
-void StateMoveCentre::cleanup(EnemyBase* enemy) { }
+void StateMoveCentre::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C364
@@ -823,7 +793,9 @@ void StateMoveTop::exec(EnemyBase* enemy)
  * @note Address: 0x8025C4C8
  * @note Size: 0x4
  */
-void StateMoveTop::cleanup(EnemyBase* enemy) { }
+void StateMoveTop::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C4CC
@@ -878,7 +850,9 @@ void StateGoHome::exec(EnemyBase* enemy)
  * @note Address: 0x8025C6DC
  * @note Size: 0x4
  */
-void StateGoHome::cleanup(EnemyBase* enemy) { }
+void StateGoHome::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C6E0
@@ -934,7 +908,9 @@ void StateAttack1::exec(EnemyBase* enemy)
  * @note Address: 0x8025C878
  * @note Size: 0x4
  */
-void StateAttack1::cleanup(EnemyBase* enemy) { }
+void StateAttack1::cleanup(EnemyBase* enemy)
+{
+}
 
 /**
  * @note Address: 0x8025C87C
@@ -998,7 +974,10 @@ void StateAttack2::exec(EnemyBase* enemy)
  * @note Address: 0x8025CADC
  * @note Size: 0x10
  */
-void StateAttack2::cleanup(EnemyBase* enemy) { enemy->disableEvent(0, EB_NoInterrupt); }
+void StateAttack2::cleanup(EnemyBase* enemy)
+{
+	enemy->disableEvent(0, EB_NoInterrupt);
+}
 
 /**
  * @note Address: 0x8025CAEC
@@ -1049,7 +1028,9 @@ void StateEat::exec(EnemyBase* enemy)
  * @note Address: 0x8025CCD0
  * @note Size: 0x4
  */
-void StateEat::cleanup(EnemyBase* enemy) { }
+void StateEat::cleanup(EnemyBase* enemy)
+{
+}
 
 } // namespace Ujib
 } // namespace Game

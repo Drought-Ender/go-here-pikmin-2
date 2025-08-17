@@ -814,7 +814,10 @@ void BaseGameSection::initGenerators()
 	PelletBirthBuffer::birthAll();
 	Iterator<Navi> iNavi = naviMgr;
 	int naviCount        = 0;
-	CI_LOOP(iNavi) { naviCount++; }
+	CI_LOOP(iNavi)
+	{
+		naviCount++;
+	}
 	switch (naviCount) {
 	case 0: {
 		bool olimarAlive  = false;
@@ -966,11 +969,11 @@ void BaseGameSection::saveToGeneratorCache(CourseInfo* courseinfo)
 
 void BaseGameSection::pmTogglePlayer()
 {
-	if (mCurrentPlayerIndex == NAVIID_Olimar) {
+	if (mPrevNaviIdx == NAVIID_Olimar) {
 		setPlayerMode(NAVIID_Louie);
 		moviePlayer->mViewport     = sys->mGfx->getViewport(PLAYER2_VIEWPORT);
 		moviePlayer->mActingCamera = mLouieCamera;
-	} else if (mCurrentPlayerIndex == NAVIID_Louie) {
+	} else if (mPrevNaviIdx == NAVIID_Louie) {
 		setPlayerMode(NAVIID_Olimar);
 		moviePlayer->mViewport     = sys->mGfx->getViewport(PLAYER1_VIEWPORT);
 		moviePlayer->mActingCamera = mOlimarCamera;
@@ -1054,7 +1057,7 @@ void BaseGameSection::setPlayerMode(int mode)
 		break;
 	}
 	}
-	mCurrentPlayerIndex = mode;
+	mPrevNaviIdx = mode;
 }
 
 /**
@@ -1098,7 +1101,7 @@ void BaseGameSection::setCamController()
 	navis[NAVIID_Olimar] = naviMgr->getAt(NAVIID_Olimar);
 	navis[NAVIID_Louie]  = naviMgr->getAt(NAVIID_Louie);
 
-	switch (mCurrentPlayerIndex) {
+	switch (mPrevNaviIdx) {
 	case NAVIID_Olimar: {
 		PlayCamera* olimarCam              = mOlimarCamera;
 		navis[NAVIID_Olimar]->mCamera      = olimarCam;
@@ -1155,7 +1158,7 @@ void BaseGameSection::setCamController()
 		break;
 	}
 	}
-	on_setCamController(mCurrentPlayerIndex);
+	on_setCamController(mPrevNaviIdx);
 }
 
 /**
@@ -1341,7 +1344,10 @@ void BaseGameSection::initLights()
  * @note Address: 0x8014EF44
  * @note Size: 0x20
  */
-void BaseGameSection::draw3D(Graphics& gfx) { newdraw_draw3D_all(gfx); }
+void BaseGameSection::draw3D(Graphics& gfx)
+{
+	newdraw_draw3D_all(gfx);
+}
 
 /**
  * @note Address: 0x8014EF64
@@ -1357,7 +1363,7 @@ void BaseGameSection::drawParticle(Graphics& gfx, int viewport)
 
 		port->setProjection();
 		port->setViewport();
-		if (!gameSystem->isMultiplayerMode() && mCurrentPlayerIndex != NAVIID_Multiplayer) {
+		if (!gameSystem->isMultiplayerMode() && mPrevNaviIdx != NAVIID_Multiplayer) {
 			mLightMgr->mFogMgr->off(gfx);
 			particleMgr->draw(port, 0);
 			mLightMgr->mFogMgr->set(gfx);
@@ -1397,7 +1403,9 @@ void BaseGameSection::draw_Ogawa2D(Graphics& gfx)
  * @note Address: 0x8014F1D8
  * @note Size: 0x4
  */
-void BaseGameSection::test_draw_treasure_detector() { }
+void BaseGameSection::test_draw_treasure_detector()
+{
+}
 
 /**
  * @note Address: 0x8014F1DC
@@ -1448,12 +1456,6 @@ void BaseGameSection::directDraw(Graphics& gfx, Viewport* vp)
 	vp->setProjection();
 	gfx.initPrimDraw(vp->getMatrix(true));
 	doDirectDraw(gfx, vp);
-	if (naviMgr) {
-		Navi* player = naviMgr->getActiveNavi();
-		if (player) {
-			player->doDirectDraw(gfx);
-		}
-	}
 	if (TexCaster::Mgr::sInstance) {
 		gfx.initPrimDraw(vp->getMatrix(true));
 		mLightMgr->mFogMgr->set(gfx);
@@ -1542,13 +1544,19 @@ void BaseGameSection::j3dViewCalc(Viewport*)
  * @note Address: 0x8014F51C
  * @note Size: 0x30
  */
-void BaseGameSection::doSimulation(f32 rate) { gameSystem->doSimulation(rate); }
+void BaseGameSection::doSimulation(f32 rate)
+{
+	gameSystem->doSimulation(rate);
+}
 
 /**
  * @note Address: 0x8014F54C
  * @note Size: 0x30
  */
-void BaseGameSection::doSimpleDraw(Viewport* vp) { gameSystem->doSimpleDraw(vp); }
+void BaseGameSection::doSimpleDraw(Viewport* vp)
+{
+	gameSystem->doSimpleDraw(vp);
+}
 
 /**
  * @note Address: 0x8014F57C
@@ -1595,7 +1603,10 @@ void BaseGameSection::doAnimation()
  * @note Address: 0x8014F754
  * @note Size: 0x4C
  */
-void BaseGameSection::changeGeneratorCursor(Vector3f& vec) { naviMgr->getAt(NAVIID_Olimar)->setPosition(vec, false); }
+void BaseGameSection::changeGeneratorCursor(Vector3f& vec)
+{
+	naviMgr->getAt(NAVIID_Olimar)->setPosition(vec, false);
+}
 
 /**
  * @note Address: 0x8014F7A0
@@ -1671,7 +1682,7 @@ void BaseGameSection::initBlendCamera()
  */
 void BaseGameSection::updateBlendCamera()
 {
-	if (mCurrentPlayerIndex == NAVIID_Olimar) {
+	if (mPrevNaviIdx == NAVIID_Olimar) {
 		mBlendFactor -= sys->mDeltaTime / 0.2f;
 		if (mBlendFactor < 0.0f) {
 			mBlendFactor         = 0.0f;
@@ -1777,7 +1788,7 @@ void BaseGameSection::updateSplitter()
 	}
 
 	mSecondViewportHeight += mSplit * sys->mDeltaTime;
-	int id = mCurrentPlayerIndex;
+	int id = mPrevNaviIdx;
 	if (id == NAVIID_Multiplayer && mSecondViewportHeight <= 0.5f) {
 		mSecondViewportHeight = 0.5f;
 		mSplit                = 0.0f;
@@ -1817,7 +1828,9 @@ void BaseGameSection::doDirectDrawPost(Graphics& gfx, Viewport*)
  * @note Address: 0x8014FD9C
  * @note Size: 0x4
  */
-void BaseGameSection::doDirectDraw(Graphics&, Viewport*) { }
+void BaseGameSection::doDirectDraw(Graphics&, Viewport*)
+{
+}
 
 /**
  * @note Address: N/A
@@ -2053,13 +2066,19 @@ namespace Game {
  * @note Address: 0x80150700
  * @note Size: 0x8
  */
-bool BaseGameSection::enableAllocHalt() { return false; }
+bool BaseGameSection::enableAllocHalt()
+{
+	return false;
+}
 
 /**
  * @note Address: 0x80150708
  * @note Size: 0x8
  */
-bool BaseGameSection::disableAllocHalt() { return false; }
+bool BaseGameSection::disableAllocHalt()
+{
+	return false;
+}
 
 /**
  * @note Address: N/A
@@ -3228,7 +3247,10 @@ void BaseGameSection::setDrawBuffer(int index)
  * @note Address: 0x80151500
  * @note Size: 0x30
  */
-void BaseGameSection::postSetupFloatMemory() { mapMgr->setupJUTTextures(); }
+void BaseGameSection::postSetupFloatMemory()
+{
+	mapMgr->setupJUTTextures();
+}
 
 /**
  * @note Address: 0x80151534
@@ -3249,7 +3271,9 @@ void BaseGameSection::createFallPikminSound()
  * @note Address: 0x80151734
  * @note Size: 0x4
  */
-void BaseGameSection::captureRadarmap(Graphics&) { }
+void BaseGameSection::captureRadarmap(Graphics&)
+{
+}
 
 /**
  * @note Address: N/A

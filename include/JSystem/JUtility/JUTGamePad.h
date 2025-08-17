@@ -291,8 +291,6 @@ struct JUTGamePad : public JKRDisposer {
 		C3ButtonReset::sCallbackArg = (u32)param_0;
 	}
 
-	inline bool isAnyInput() const { return mButton.mButton != 0 || mMStick.mStickMag != 0 || mSStick.mStickMag != 0; }
-
 	void initList();
 	static void init();
 	static u32 read();

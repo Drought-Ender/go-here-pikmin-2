@@ -27,19 +27,6 @@ bool AreAllPikisBlue(Navi* navi)
 	return true;
 }
 
-bool IsGameWorldActive()
-{
-	if (moviePlayer && moviePlayer->mDemoState != DEMOSTATE_Inactive) {
-		return false;
-	}
-
-	if (!gameSystem->isFlag(GAMESYS_IsGameWorldActive)) {
-		return false;
-	}
-
-	return !gameSystem->paused_soft();
-}
-
 void BaseGameSection::directDraw(Graphics& gfx, Viewport* vp)
 {
 	vp->setViewport();
@@ -165,7 +152,7 @@ void NaviGoHereState::exec(Navi* player)
 
 	// Update the camera angle
 	Vector3f playerPos = player->getPosition();
-	if (player->mNaviIndex == gameSystem->mSection->mCurrentPlayerIndex) {
+	if (player->mNaviIndex == gameSystem->mSection->mPrevNaviIdx) {
 		static f32 currentAngle = roundAng(player->getFaceDir() + PI);
 		f32 targetAngle         = roundAng(player->getFaceDir() + PI);
 
@@ -178,7 +165,7 @@ void NaviGoHereState::exec(Navi* player)
 
 	// If we haven't moved in a while, start incrementing the giveup timer
 	{
-		f32 distanceBetweenLast = Vector3f::qDistance(playerPos, mLastPosition);
+		f32 distanceBetweenLast = playerPos.qDistance(mLastPosition);
 		mLastPosition           = playerPos;
 		if (distanceBetweenLast <= 1.5f) {
 			mTimeoutTimer += sys->mDeltaTime;
@@ -281,7 +268,7 @@ void NaviGoHereState::handlePlayerChangeFix(Navi* player)
 {
 	static f32 forceTimer = 0.0f;
 
-	u32 playerIdx = gameSystem->mSection->mCurrentPlayerIndex;
+	u32 playerIdx = gameSystem->mSection->mPrevNaviIdx;
 	// Only apply the change if we're the intended active player
 	if (player->mNaviIndex != playerIdx) {
 		return;

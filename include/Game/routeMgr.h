@@ -157,7 +157,7 @@ struct WPSearchArg {
 };
 
 struct WPEdgeSearchArg {
-	WPEdgeSearchArg(const Vector3f& startPos)
+	WPEdgeSearchArg(Vector3f& startPos)
 	{
 		mWp2           = nullptr;
 		mWp1           = nullptr;

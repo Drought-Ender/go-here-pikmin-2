@@ -117,7 +117,6 @@ struct OptimiseController : public JKRDisposer, public Parameters {
 
 extern GameSystem* gameSystem;
 
-bool IsGameWorldActive();
 } // namespace Game
 
 #endif

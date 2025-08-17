@@ -257,7 +257,7 @@ u16 WaypointPathfinder::findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, Pa
 			// Leave the expensive till last
 			Game::CurrTriInfo triangleAtWp;
 			triangleAtWp.mPosition          = neighborWP->mPosition;
-			triangleAtWp.mGetTopPolygonInfo = false;
+			triangleAtWp.mUpdateOnNewMaxY   = false;
 			Game::mapMgr->getCurrTri(triangleAtWp);
 			if (!triangleAtWp.mTriangle || triangleAtWp.mTriangle->mCode.getSlipCode() != MapCode::Code::SlipCode_NoSlip) {
 				continue;

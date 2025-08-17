@@ -146,7 +146,10 @@ Obj::Obj()
  * @note Address: 0x8034FC54
  * @note Size: 0x34
  */
-void Obj::doUpdate() { mFsm->exec(this); }
+void Obj::doUpdate()
+{
+	mFsm->exec(this);
+}
 
 /**
  * @note Address: 0x8034FC88
@@ -444,13 +447,18 @@ lbl_80350298:
  * @note Address: 0x803502D0
  * @note Size: 0x4
  */
-void Obj::doDirectDraw(Graphics&) { }
+void Obj::doDirectDraw(Graphics&)
+{
+}
 
 /**
  * @note Address: 0x803502D4
  * @note Size: 0x20
  */
-void Obj::doDebugDraw(Graphics& graphics) { EnemyBase::doDebugDraw(graphics); }
+void Obj::doDebugDraw(Graphics& graphics)
+{
+	EnemyBase::doDebugDraw(graphics);
+}
 
 /**
  * @note Address: 0x803502F4
@@ -527,7 +535,10 @@ bool Obj::pressCallBack(Creature* creature, f32 damage, CollPart* part)
  * @note Address: 0x803504E0
  * @note Size: 0x2C
  */
-bool Obj::hipdropCallBack(Creature* source, f32 damage, CollPart* part) { pressCallBack(source, damage, part); }
+bool Obj::hipdropCallBack(Creature* source, f32 damage, CollPart* part)
+{
+	pressCallBack(source, damage, part);
+}
 
 /**
  * @note Address: 0x8035050C
@@ -666,7 +677,10 @@ bool Obj::needShadow()
  * @note Address: 0x803509D0
  * @note Size: 0x28
  */
-void Obj::startCarcassMotion() { EnemyBase::startMotion(PANMODOKIANIM_Carry, nullptr); }
+void Obj::startCarcassMotion()
+{
+	EnemyBase::startMotion(PANMODOKIANIM_Carry, nullptr);
+}
 
 /**
  * @note Address: 0x803509F8
@@ -758,7 +772,10 @@ void Obj::initWalkSmokeEffect()
  * @note Address: 0x80350CCC
  * @note Size: 0x8
  */
-WalkSmokeEffect::Mgr* Obj::getWalkSmokeEffectMgr() { return &mWalkSmokeMgr; }
+WalkSmokeEffect::Mgr* Obj::getWalkSmokeEffectMgr()
+{
+	return &mWalkSmokeMgr;
+}
 
 /**
  * @note Address: 0x80350CD4
@@ -987,7 +1004,6 @@ void Obj::walkFunc()
  */
 bool Obj::isReachToGoal(f32 radius)
 {
-	f32 rad = radius;
 	if (isDead()) {
 		return false;
 	}
@@ -995,16 +1011,14 @@ bool Obj::isReachToGoal(f32 radius)
 	Creature* creature = mTargetCreature;
 	if (creature) {
 		P2ASSERTLINE(1200, creature);
-		rad += static_cast<Pellet*>(creature)->mConfig->mParams.mRadius.mData;
+		radius += static_cast<Pellet*>(creature)->mConfig->mParams.mRadius.mData;
 	} else {
-		rad *= 2.0f;
+		radius *= 2.0f;
 	}
 
-	rad *= rad;
-	if (sqrDistanceXZ(mPosition, mNextWayPointPosition) < rad) {
+	if (inRadius(radius, mPosition, mNextWayPointPosition)) {
 		if (getStateID() == PANMODOKI_Walk && mTargetCreature) {
-			Vector3f targetPos(mTargetCreature->getPosition().x, 0.0f, mTargetCreature->getPosition().z);
-			if (sqrDistanceXZ(mPosition, targetPos) < rad) {
+			if (isCreatureIn2DRadius(radius, mPosition)) {
 				mFsm->transit(this, PANMODOKI_Stick, nullptr);
 			}
 		}
@@ -1012,119 +1026,6 @@ bool Obj::isReachToGoal(f32 radius)
 		return true;
 	}
 	return false;
-	/*
-	stwu     r1, -0x50(r1)
-	mflr     r0
-	stw      r0, 0x54(r1)
-	stfd     f31, 0x40(r1)
-	psq_st   f31, 72(r1), 0, qr0
-	stfd     f30, 0x30(r1)
-	psq_st   f30, 56(r1), 0, qr0
-	stw      r31, 0x2c(r1)
-	stw      r30, 0x28(r1)
-	mr       r30, r3
-	lfs      f0, lbl_8051E490@sda21(r2)
-	lfs      f2, 0x200(r3)
-	fmr      f30, f1
-	fcmpo    cr0, f2, f0
-	cror     2, 0, 2
-	bne      lbl_80351710
-	li       r3, 0
-	b        lbl_80351824
-
-lbl_80351710:
-	lwz      r31, 0x230(r30)
-	cmplwi   r31, 0
-	beq      lbl_8035174C
-	bne      lbl_8035173C
-	lis      r3, lbl_80490EF8@ha
-	lis      r5, lbl_80490F08@ha
-	addi     r3, r3, lbl_80490EF8@l
-	li       r4, 0x4b0
-	addi     r5, r5, lbl_80490F08@l
-	crclr    6
-	bl       panic_f__12JUTExceptionFPCciPCce
-
-lbl_8035173C:
-	lwz      r3, 0x35c(r31)
-	lfs      f0, 0xa0(r3)
-	fadds    f30, f30, f0
-	b        lbl_80351754
-
-lbl_8035174C:
-	lfs      f0, lbl_8051E4D4@sda21(r2)
-	fmuls    f30, f30, f0
-
-lbl_80351754:
-	lfs      f1, 0x194(r30)
-	fmuls    f30, f30, f30
-	lfs      f0, 0x2c4(r30)
-	lfs      f2, 0x18c(r30)
-	fsubs    f1, f1, f0
-	lfs      f0, 0x2bc(r30)
-	fsubs    f2, f2, f0
-	fmuls    f0, f1, f1
-	fmadds   f0, f2, f2, f0
-	fcmpo    cr0, f0, f30
-	bge      lbl_80351820
-	mr       r3, r30
-	bl       getStateID__Q24Game9EnemyBaseFv
-	cmpwi    r3, 1
-	bne      lbl_80351810
-	lwz      r4, 0x230(r30)
-	cmplwi   r4, 0
-	beq      lbl_80351810
-	lwz      r12, 0(r4)
-	addi     r3, r1, 8
-	lwz      r12, 8(r12)
-	mtctr    r12
-	bctrl
-	lwz      r4, 0x230(r30)
-	addi     r3, r1, 0x14
-	lfs      f31, 0x10(r1)
-	lwz      r12, 0(r4)
-	lwz      r12, 8(r12)
-	mtctr    r12
-	bctrl
-	lfs      f0, 0x194(r30)
-	lfs      f2, 0x14(r1)
-	fsubs    f1, f0, f31
-	lfs      f0, 0x18c(r30)
-	fsubs    f2, f0, f2
-	fmuls    f0, f1, f1
-	fmadds   f0, f2, f2, f0
-	fcmpo    cr0, f0, f30
-	bge      lbl_80351810
-	lwz      r3, 0x380(r30)
-	mr       r4, r30
-	li       r5, 8
-	li       r6, 0
-	lwz      r12, 0(r3)
-	lwz      r12, 0x14(r12)
-	mtctr    r12
-	bctrl
-
-lbl_80351810:
-	li       r0, 0
-	li       r3, 1
-	stw      r0, 0x318(r30)
-	b        lbl_80351824
-
-lbl_80351820:
-	li       r3, 0
-
-lbl_80351824:
-	psq_l    f31, 72(r1), 0, qr0
-	lfd      f31, 0x40(r1)
-	psq_l    f30, 56(r1), 0, qr0
-	lfd      f30, 0x30(r1)
-	lwz      r31, 0x2c(r1)
-	lwz      r0, 0x54(r1)
-	lwz      r30, 0x28(r1)
-	mtlr     r0
-	addi     r1, r1, 0x50
-	blr
-	*/
 }
 
 /**
@@ -1669,7 +1570,10 @@ void Obj::calcSlotGlobalPos(Vector3f& pos)
  * @note Address: 0x803535A8
  * @note Size: 0x28
  */
-void Obj::boundEffect() { createBounceEffect(mPosition, mBounceEffectSize); }
+void Obj::boundEffect()
+{
+	createBounceEffect(mPosition, mBounceEffectSize);
+}
 
 /**
  * @note Address: 0x803535D0
@@ -1706,7 +1610,10 @@ void Obj::createHideEffect()
  * @note Address: 0x80353798
  * @note Size: 0x30
  */
-void Obj::fadeHideEffect() { mEfxHide->fade(); }
+void Obj::fadeHideEffect()
+{
+	mEfxHide->fade();
+}
 
 /**
  * @note Address: 0x803537C8
@@ -1722,7 +1629,10 @@ void Obj::createPulledSmokeEffect()
  * @note Address: 0x8035384C
  * @note Size: 0x30
  */
-void Obj::fadePulledSmokeEffect() { mEfxSmoke->fade(); }
+void Obj::fadePulledSmokeEffect()
+{
+	mEfxSmoke->fade();
+}
 
 /**
  * @note Address: 0x8035387C
@@ -1789,13 +1699,19 @@ Obj::Obj()
  * @note Address: 0x80353C00
  * @note Size: 0x34
  */
-void Obj::appearRumble() { rumbleMgr->startRumble(RUMBLETYPE_Fixed11, mPosition, RUMBLEID_Both); }
+void Obj::appearRumble()
+{
+	rumbleMgr->startRumble(RUMBLETYPE_Fixed11, mPosition, RUMBLEID_Both);
+}
 
 /**
  * @note Address: 0x80353C34
  * @note Size: 0x34
  */
-void Obj::hideRumble() { rumbleMgr->startRumble(RUMBLETYPE_Fixed10, mPosition, RUMBLEID_Both); }
+void Obj::hideRumble()
+{
+	rumbleMgr->startRumble(RUMBLETYPE_Fixed10, mPosition, RUMBLEID_Both);
+}
 
 /**
  * @note Address: 0x80353C68

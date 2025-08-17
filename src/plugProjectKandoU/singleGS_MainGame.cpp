@@ -102,10 +102,16 @@ void GameState::init(SingleGameSection* game, StateArg* arg)
 
 		// Set all enemies to be active in intro
 		GeneralMgrIterator<EnemyBase> iEnemyMgr(generalEnemyMgr);
-		CI_LOOP(iEnemyMgr) { iEnemyMgr.getObject()->movie_begin(false); }
+		CI_LOOP(iEnemyMgr)
+		{
+			iEnemyMgr.getObject()->movie_begin(false);
+		}
 
 		Iterator<Piki> iPiki(pikiMgr);
-		CI_LOOP(iPiki) { (*iPiki)->movie_begin(false); }
+		CI_LOOP(iPiki)
+		{
+			(*iPiki)->movie_begin(false);
+		}
 		moviePlayArg.mDelegateStart = game->mMovieStartCallback;
 		moviePlayer->play(moviePlayArg);
 		gameSystem->mTimeMgr->setStartTime();
@@ -284,7 +290,10 @@ bool GameState::check_DemoInout(SingleGameSection* game)
  * @note Address: 0x802140E4
  * @note Size: 0xC
  */
-void GameState::on_section_fadeout(SingleGameSection*) { mDoExit = 1; }
+void GameState::on_section_fadeout(SingleGameSection*)
+{
+	mDoExit = 1;
+}
 
 /**
  * @note Address: 0x802140F0
@@ -316,7 +325,7 @@ void GameState::on_demo_timer(SingleGameSection* game, u32 id)
 		Navi* navi = naviMgr->getActiveNavi();
 		if (!navi) {
 			int id = 1;
-			if (!gameSystem->mSection->mCurrentPlayerIndex)
+			if (!gameSystem->mSection->mPrevNaviIdx)
 				id = 0;
 			navi = naviMgr->getAt(id);
 		}
@@ -332,7 +341,7 @@ void GameState::on_demo_timer(SingleGameSection* game, u32 id)
 		Navi* navi = naviMgr->getActiveNavi();
 		if (!navi) {
 			int id = 1;
-			if (!gameSystem->mSection->mCurrentPlayerIndex)
+			if (!gameSystem->mSection->mPrevNaviIdx)
 				id = 0;
 			navi = naviMgr->getAt(id);
 		}
@@ -354,7 +363,7 @@ void GameState::on_demo_timer(SingleGameSection* game, u32 id)
 		Navi* navi = naviMgr->getActiveNavi();
 		if (!navi) {
 			int id = 1;
-			if (!gameSystem->mSection->mCurrentPlayerIndex)
+			if (!gameSystem->mSection->mPrevNaviIdx)
 				id = 0;
 			navi = naviMgr->getAt(id);
 		}
@@ -542,7 +551,7 @@ void GameState::exec(SingleGameSection* game)
 			Navi* navi = naviMgr->getActiveNavi();
 			if (!navi) {
 				int id = 1;
-				if (!gameSystem->mSection->mCurrentPlayerIndex)
+				if (!gameSystem->mSection->mPrevNaviIdx)
 					id = 0;
 				navi = naviMgr->getAt(id);
 			}
@@ -604,7 +613,9 @@ void GameState::onHoleIn(SingleGameSection* game, ItemCave::Item* item)
  * @note Address: 0x80215684
  * @note Size: 0x4
  */
-void GameState::onMovieCommand(SingleGameSection*, int) { }
+void GameState::onMovieCommand(SingleGameSection*, int)
+{
+}
 
 /**
  * @note Address: 0x80215688

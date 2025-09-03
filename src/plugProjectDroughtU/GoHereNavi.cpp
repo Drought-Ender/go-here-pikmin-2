@@ -416,6 +416,17 @@ void NaviGoHereState::changeState(Navi* player, bool isWanted)
 }
 
 
+void Navi::doSimulation(f32 timeStep)
+{
+	if (moviePlayer->isFlag(MVP_IsActive)) {
+		mVelocity       = Vector3f(0.0f);
+		mTargetVelocity = Vector3f(0.0f);
+		mAcceleration   = Vector3f(0.0f);
+	}
+
+	FakePiki::doSimulation(timeStep);
+}
+
 void Navi::doDirectDraw(Graphics& gfx)
 {
 #if GO_HERE_NAVI_DEBUG

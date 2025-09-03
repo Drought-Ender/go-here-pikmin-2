@@ -136,6 +136,10 @@ void NaviGoHereState::exec(Navi* player)
 		if (!player->isAlive()) {
 			return;
 		}
+
+		if (gameSystem->mIsFrozen) {
+			return;
+		}
 	}
 
 	// Handle movement towards the target
@@ -418,6 +422,10 @@ void NaviGoHereState::changeState(Navi* player, bool isWanted)
 
 void Navi::doSimulation(f32 timeStep)
 {
+	if (gameSystem->mIsFrozen && getStateID() == NSID_GoHere) {
+		return;
+	}
+
 	if (moviePlayer->isFlag(MVP_IsActive)) {
 		mVelocity       = Vector3f(0.0f);
 		mTargetVelocity = Vector3f(0.0f);

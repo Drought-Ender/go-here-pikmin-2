@@ -3389,32 +3389,6 @@ lbl_constructor:
 /* 80141E98 0013EDD8  4E 80 00 20 */	blr 
 .endfn updateCursor__Q24Game4NaviFv
 
-.fn doSimulation__Q24Game4NaviFf, global
-/* 80141E9C 0013EDDC  94 21 FF F0 */	stwu r1, -0x10(r1)
-/* 80141EA0 0013EDE0  7C 08 02 A6 */	mflr r0
-/* 80141EA4 0013EDE4  90 01 00 14 */	stw r0, 0x14(r1)
-/* 80141EA8 0013EDE8  80 8D 9B 54 */	lwz r4, moviePlayer__4Game@sda21(r13)
-/* 80141EAC 0013EDEC  80 04 01 F0 */	lwz r0, 0x1f0(r4)
-/* 80141EB0 0013EDF0  54 00 07 FF */	clrlwi. r0, r0, 0x1f
-/* 80141EB4 0013EDF4  41 82 00 2C */	beq .L_80141EE0
-/* 80141EB8 0013EDF8  C0 02 9F F4 */	lfs f0, lbl_80518354@sda21(r2)
-/* 80141EBC 0013EDFC  D0 03 02 00 */	stfs f0, 0x200(r3)
-/* 80141EC0 0013EE00  D0 03 02 04 */	stfs f0, 0x204(r3)
-/* 80141EC4 0013EE04  D0 03 02 08 */	stfs f0, 0x208(r3)
-/* 80141EC8 0013EE08  D0 03 01 E4 */	stfs f0, 0x1e4(r3)
-/* 80141ECC 0013EE0C  D0 03 01 E8 */	stfs f0, 0x1e8(r3)
-/* 80141ED0 0013EE10  D0 03 01 EC */	stfs f0, 0x1ec(r3)
-/* 80141ED4 0013EE14  D0 03 01 1C */	stfs f0, 0x11c(r3)
-/* 80141ED8 0013EE18  D0 03 01 20 */	stfs f0, 0x120(r3)
-/* 80141EDC 0013EE1C  D0 03 01 24 */	stfs f0, 0x124(r3)
-.L_80141EE0:
-/* 80141EE0 0013EE20  4B FF CE FD */	bl doSimulation__Q24Game8FakePikiFf
-/* 80141EE4 0013EE24  80 01 00 14 */	lwz r0, 0x14(r1)
-/* 80141EE8 0013EE28  7C 08 03 A6 */	mtlr r0
-/* 80141EEC 0013EE2C  38 21 00 10 */	addi r1, r1, 0x10
-/* 80141EF0 0013EE30  4E 80 00 20 */	blr 
-.endfn doSimulation__Q24Game4NaviFf
-
 .fn doSetView__Q24Game4NaviFi, global
 /* 80141EF4 0013EE34  94 21 FF F0 */	stwu r1, -0x10(r1)
 /* 80141EF8 0013EE38  7C 08 02 A6 */	mflr r0

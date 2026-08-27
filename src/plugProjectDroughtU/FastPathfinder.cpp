@@ -285,6 +285,7 @@ u16 WaypointPathfinder::findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, Pa
 
 	// No path found at all
 	outPath.allocate(0);
+	cleanup(openList, closedList);
 	return 0;
 }
 } // namespace Drought

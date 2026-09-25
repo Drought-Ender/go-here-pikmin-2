@@ -117,12 +117,13 @@ struct NodeMap {
 
 class WaypointPathfinder {
 public:
-	static u16 findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, Path& outPath);
+	static u16 findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, bool backwards, Path& outPath);
 
 private:
 	static inline f32 calculateHeuristic(Game::WayPoint* from, Game::WayPoint* to);
 	static void reconstructPath(PathNode* endNode, Path& outPath);
 	static void cleanup(NodeList& openList, NodeList& closedList);
+	static bool isSlopeTraversable(const Vector3f& a, const Vector3f& b);
 };
 
 } // namespace Drought

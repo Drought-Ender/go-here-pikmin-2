@@ -414,10 +414,10 @@ void GoHereMapMenu::execPathfinding()
 	mPath.clear();
 
 	// Try end-to-start (works better for some cases)
-	Drought::WaypointPathfinder::findPath(mDestinationIndex, mStartIndex, flag, mPath);
+	Drought::WaypointPathfinder::findPath(mDestinationIndex, mStartIndex, flag, true, mPath);
 	if (!mPath.hasPath()) {
 		// First try: no path, let's try the other way
-		Drought::WaypointPathfinder::findPath(mStartIndex, mDestinationIndex, flag, mPath);
+		Drought::WaypointPathfinder::findPath(mStartIndex, mDestinationIndex, flag, false, mPath);
 		if (!mPath.hasPath()) {
 			// Second try: we searched front and back, but nothing, damn
 			mFoundPath     = false;

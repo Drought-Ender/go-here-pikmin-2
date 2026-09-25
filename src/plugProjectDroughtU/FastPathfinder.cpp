@@ -181,7 +181,26 @@ void WaypointPathfinder::cleanup(NodeList& openList, NodeList& closedList)
 	}
 }
 
-u16 WaypointPathfinder::findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, Path& outPath)
+bool WaypointPathfinder::isSlopeTraversable(const Vector3f& a, const Vector3f& b) {
+	f32 dy = b.y - a.y;
+	if (dy <= 0.0f) return true; // Walking flat or downhill is OK
+
+	f32 dx = b.x - a.x;
+	f32 dz = b.z - a.z;
+
+	f32 horizontalDistSq = dx * dx + dz * dz;
+	if (horizontalDistSq < 0.0001f) return false; // Walking into a vertical wall is not OK (avoid divide by zero)
+
+	f32 slopeSq = (dy * dy) / horizontalDistSq;
+
+	// The upward slope is assumed to be traversable if:
+	// 1. The two waypoints are further than 50 units apart on the horizontal plane
+	// 2. OR, the slope is 45 degrees or less.
+	// Otherwise, two very nearby waypoints with a slope greater than 45 degrees is assumed to be non-traversable.
+	return horizontalDistSq > SQUARE(50.0f) || slopeSq <= 1.0f;
+}
+
+u16 WaypointPathfinder::findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, bool backwards, Path& outPath)
 {
 	if (startIdx == destIdx) {
 		outPath.allocate(1);
@@ -254,8 +273,14 @@ u16 WaypointPathfinder::findPath(s16 startIdx, s16 destIdx, u32 allowedFlags, Pa
 				continue; // Skip unvisited waypoints when not allowed
 			}
 
+			if ((backwards && !isSlopeTraversable(neighborWP->mPosition, currentWP->mPosition)) ||
+				(!backwards && !isSlopeTraversable(currentWP->mPosition, neighborWP->mPosition))) {
+				continue; // Skip steep slopes
+			}
+
 			// Leave the expensive till last
-			if (!neighborWP->isFlag(Game::WPF_Bridge)) {
+			f32 dy = backwards ? currentWP->mPosition.y - neighborWP->mPosition.y : neighborWP->mPosition.y - currentWP->mPosition.y;
+			if (!neighborWP->isFlag(Game::WPF_Bridge) && dy > 0.0f) {
 				Game::CurrTriInfo triangleAtWp;
 				triangleAtWp.mPosition          = neighborWP->mPosition;
 				triangleAtWp.mUpdateOnNewMaxY   = false;
